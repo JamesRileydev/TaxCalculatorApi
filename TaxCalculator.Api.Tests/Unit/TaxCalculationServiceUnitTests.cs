@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutofacContrib.NSubstitute;
+using NSubstitute;
+using TaxCalculator.Api.Models;
 using TaxCalculator.Api.Services;
 using Xunit;
 
@@ -9,14 +13,16 @@ namespace TaxCalculator.Api.Tests.Unit
     public class TaxCalculationServiceUnitTests
     {
         [Fact]
-        public async Task Test_Method_ReturnsNull()
+        public async Task CalculateTaxAsync_Returns_NullNull()
         {
             var autoSub = new AutoSubstitute();
             var taxSvc = autoSub.Resolve<ITaxCalculationService>();
 
-            var result = await taxSvc.TestMethod().ConfigureAwait(false);
+            var (result, error) = await taxSvc.CalculateTaxAsync(Arg.Any<List<OrderItem>>(), Arg.Any<Guid>())
+                .ConfigureAwait(false);
 
-            Assert.True(true);
+            Assert.Null(result);
+            Assert.Null(error);
         }
     }
 }
