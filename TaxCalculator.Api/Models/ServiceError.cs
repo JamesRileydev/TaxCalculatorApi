@@ -4,14 +4,7 @@ using TaxCalculator.Api.Converters;
 
 namespace TaxCalculator.Api.Models
 {
-    public interface IServiceError
-    {
-        string Message { get; set; }
-
-        [JsonConverter(typeof(ExceptionConverter))]
-        Exception Exception { get; set; }
-    }
-    public class ServiceError: IServiceError
+    public class ServiceError
     {
         public string Message { get; set; }
 

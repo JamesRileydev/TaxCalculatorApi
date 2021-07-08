@@ -1,16 +1,32 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using TaxCalculator.Api.Enums;
 
 namespace TaxCalculator.Api.Models
 {
-    public class OrderItem
+    public record OrderItem
     {
+        [Required]
+        [NotNull]
         public string Name { get; set; }
 
+        [Required]
+        [NotNull]
         public ItemCategories Category { get; set; }
 
+        [Required]
+        [NotNull]
         public decimal Price { get; set; }
-
+        
+        [Required]
+        [NotNull]
         public int Quantity { get; set; }
+
+
+        [Required] 
+        [NotNull] 
+        public decimal AggregatePrice => 
+            Price * Quantity;
+
     }
 }
