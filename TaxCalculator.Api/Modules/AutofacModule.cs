@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using TaxCalculator.Api.Data;
 using TaxCalculator.Api.Services;
 
 namespace TaxCalculator.Api.Modules
@@ -9,6 +10,10 @@ namespace TaxCalculator.Api.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<TaxCalculationService>()
+                .AsImplementedInterfaces()
+                .SingleInstance();
+
+            builder.RegisterType<MockRepository>()
                 .AsImplementedInterfaces()
                 .SingleInstance();
         }
