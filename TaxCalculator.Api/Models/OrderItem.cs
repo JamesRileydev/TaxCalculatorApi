@@ -28,6 +28,14 @@ namespace TaxCalculator.Api.Models
         public decimal AggregateTotal =>
             AggregateTotalEach * Quantity;
 
+        public string CreateItemDescription()
+        {
+            if (Quantity > 1)
+            {
+                return $"{Name}: {AggregateTotal} ({Quantity} @ {AggregateTotalEach})";
+            }
 
+            return $"{Name}: {AggregateTotal}";
+        }
     }
 }
