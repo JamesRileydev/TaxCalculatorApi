@@ -38,7 +38,7 @@ namespace TaxCalculator.Api.Controllers
         {
             if (!ModelState.IsValid || order.Count == 0)
             {
-                return ErrorJsonResult(
+                return ErrorJsonResult(HttpStatusCode.BadRequest,
                     new ServiceError
                     {
                         Message = "Payload must contain at least one valid item in a JSON array."
@@ -51,7 +51,7 @@ namespace TaxCalculator.Api.Controllers
 
             if (error is not null)
             {
-                return ErrorJsonResult(error);
+                return ErrorJsonResult(HttpStatusCode.InternalServerError, error);
             }
 
             return CreatedJsonResult(result, id);
@@ -59,11 +59,11 @@ namespace TaxCalculator.Api.Controllers
 
 
         [NonAction]
-        private IActionResult ErrorJsonResult(IServiceError error)
+        private IActionResult ErrorJsonResult(HttpStatusCode status , IServiceError error)
         {
             return new JsonResult(error, SerializerOptions)
             {
-                StatusCode = (int)HttpStatusCode.InternalServerError
+                StatusCode = (int)status
             };
         }
         
