@@ -36,7 +36,15 @@ namespace TaxCalculator.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> PlaceOrder([FromBody] List<OrderItem> order)
         {
-            //TODO - Add validation for incoming orders
+            if (!ModelState.IsValid || order.Count == 0)
+            {
+                return ErrorJsonResult(
+                    new ServiceError
+                    {
+                        Message = "Payload must contain at least one valid item in a JSON array."
+                    });
+            }
+
             var id = Guid.NewGuid();
 
             var (result, error) = await TaxCalculationSvc.CalculateTaxAsync(order, id).ConfigureAwait(false);
