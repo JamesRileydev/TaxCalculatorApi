@@ -67,7 +67,6 @@ namespace TaxCalculator.Api.Services
                 });
             }
 
-
             if (basicTaxRate is 0)
             {
                 Log.LogError("[{id}] A value was not returned while retrieving the Basic Tax rate", id);
@@ -77,7 +76,6 @@ namespace TaxCalculator.Api.Services
                 });
             }
 
-
             decimal importTaxRate;
             try
             {
@@ -86,11 +84,11 @@ namespace TaxCalculator.Api.Services
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, "[{id}] An error occurred while retrieving the basic tax rate. See exception for details.", id);
+                Log.LogError(ex, "[{id}] An error occurred while retrieving the import tax rate. See exception for details.", id);
                 return (null, new ServiceError
                 {
                     Exception = ex,
-                    Message = $"An error occurred while retrieving the basic tax rate for order ID: {id}." +
+                    Message = $"An error occurred while retrieving the import tax rate for order ID: {id}." +
                               " See exception for more details."
                 });
             }
@@ -149,7 +147,7 @@ namespace TaxCalculator.Api.Services
                     });
                 }
 
-                receipt.Tax += calculatedItem.SalesTax;
+                receipt.Tax += calculatedItem.SalesTaxEach * calculatedItem.Quantity;
                 receipt.Total += calculatedItem.AggregateTotal;
                 receipt.OrderItems.Add(calculatedItem.ToString());
             }
@@ -161,9 +159,9 @@ namespace TaxCalculator.Api.Services
         private OrderItem CalculateBasicSalesTax(OrderItem item, decimal basicTaxRate)
         {
             var tax = item.Price * (basicTaxRate / 100);
-            var roundedTax = Math.Round(tax * 20) / 20;
+            var roundedTax = Math.Ceiling(tax * 20) / 20;
 
-            item.SalesTax = roundedTax;
+            item.SalesTaxEach = roundedTax;
 
             return item;
         }
@@ -171,12 +169,12 @@ namespace TaxCalculator.Api.Services
         private OrderItem CalculateBasicSalesAndImportTax(OrderItem item, decimal basicTaxRate, decimal importTaxRate)
         {
             var basicTax = item.Price * (basicTaxRate / 100);
-            var basicRoundedTax = Math.Round(basicTax * 20) / 20;
+            var basicRoundedTax = Math.Ceiling(basicTax * 20) / 20;
 
             var importTax = item.Price * (importTaxRate / 100);
-            var importRoundedTax = Math.Round(importTax * 20) / 20;
+            var importRoundedTax = Math.Ceiling(importTax * 20) / 20;
 
-            item.SalesTax = basicRoundedTax + importRoundedTax;
+            item.SalesTaxEach = basicRoundedTax + importRoundedTax;
 
             return item;
         }
@@ -184,11 +182,10 @@ namespace TaxCalculator.Api.Services
         private OrderItem CalculateImportTax(OrderItem item, decimal importTaxRate)
         {
             var importTax = item.Price * (importTaxRate / 100);
-            var importRoundedTax = Math.Round(importTax * 20) / 20;
+            var importRoundedTax = Math.Ceiling(importTax * 20) / 20;
 
-            item.SalesTax = importRoundedTax * item.Quantity;
+            item.SalesTaxEach = importRoundedTax;
 
-            Debugger.Break();
             return item;
         }
     }

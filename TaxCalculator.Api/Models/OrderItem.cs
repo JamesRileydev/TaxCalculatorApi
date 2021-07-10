@@ -11,23 +11,23 @@ namespace TaxCalculator.Api.Models
         public string Name { get; set; }
 
         [Required]
-        [NotNull]
+        [Range(1, 4, ErrorMessage = "Item must have category from 1 t0 4")]
         public ItemCategories Category { get; set; }
 
         [Required]
-        [NotNull]
+        [Range(0.01, 9999999999999999.99, ErrorMessage = "Invalid Target Price; Max 18 digits")]
         public decimal Price { get; set; }
 
-        [Required]
-        [NotNull]
-        public int Quantity { get; set; }
+        public int Quantity { get; set; } = 1;
 
-        public decimal AggregatePrice => 
-            Price * Quantity;
+        public decimal SalesTaxEach { get; set; }
+
+        public decimal AggregateTotalEach =>
+            Price + SalesTaxEach;  
 
         public decimal AggregateTotal =>
-            SalesTax + AggregatePrice;
+            AggregateTotalEach * Quantity;
 
-        public decimal SalesTax { get; set; }
+
     }
 }
