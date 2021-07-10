@@ -22,11 +22,9 @@ namespace TaxCalculator.Api.Models
         [NotNull]
         public int Quantity { get; set; }
 
-
-        [Required] 
-        [NotNull] 
         public decimal AggregatePrice => 
             Price * Quantity;
 
+        public decimal SalesTax { get; set; }
     }
 }

@@ -4,11 +4,21 @@ using TaxCalculator.Api.Converters;
 
 namespace TaxCalculator.Api.Models
 {
-    public class ServiceError
+    public interface IServiceError
     {
         public string Message { get; set; }
 
         [JsonConverter(typeof(ExceptionConverter))]
         public Exception Exception { get; set; }
     }
+
+    public class ServiceError : IServiceError
+    {
+        public string Message { get; set; }
+
+        [JsonConverter(typeof(ExceptionConverter))]
+        public Exception Exception { get; set; }
+    }
+
+    public class NotImplementedError : ServiceError{ }
 }

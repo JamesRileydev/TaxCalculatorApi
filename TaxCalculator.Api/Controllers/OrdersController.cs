@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,11 @@ namespace TaxCalculator.Api.Controllers
     [Route("api/[controller]")]
     public class OrdersController : Controller
     {
-        private JsonSerializerOptions SerializerOptions = new()
+        private JsonSerializerOptions SerializerOptions { get; } = new()
         {
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
         };
 
         public ITaxCalculationService TaxCalculationSvc { get; }
@@ -40,29 +43,35 @@ namespace TaxCalculator.Api.Controllers
 
             if (error is not null)
             {
-                return JsonErrorResult(error, id);
+                return ErrorJsonResult(error);
             }
 
-            return JsonSuccessResult(result, id);
+            return CreatedJsonResult(result, id);
         }
 
 
         [NonAction]
-        private IActionResult JsonErrorResult(ServiceError error, Guid id)
+        private IActionResult ErrorJsonResult(ServiceError error)
+        {
+            return new JsonResult(error, SerializerOptions)
+            {
+                StatusCode = (int)HttpStatusCode.InternalServerError
+            };
+        }
+        
+        [NonAction]
+        private IActionResult CreatedJsonResult(Receipt result, Guid id)
         {
             return new JsonResult(new
             {
-
-            })
+                id,
+                result.OrderItems,
+                result.Tax,
+                result.Total
+            }, SerializerOptions)
             {
-                SerializerSettings = SerializerOptions
+                StatusCode = (int)HttpStatusCode.Created
             };
-        }
-
-        [NonAction]
-        private IActionResult JsonSuccessResult(Receipt result, Guid id)
-        {
-            return Ok(result);
         }
     }
 }

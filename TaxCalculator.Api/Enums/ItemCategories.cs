@@ -4,6 +4,8 @@
     {
         Unknown = 0,
         Exempt,
-        Import 
+        ExemptImport,
+        Basic,
+        BasicImport
     }
 }

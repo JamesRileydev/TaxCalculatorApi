@@ -13,16 +13,18 @@ namespace TaxCalculator.Api.Tests.Unit
     public class TaxCalculationServiceUnitTests
     {
         [Fact]
-        public async Task CalculateTaxAsync_Returns_NullNull()
+        public async Task CalculateTaxAsync_ReturnsServiceError_WhenLINQThrows()
         {
             var autoSub = new AutoSubstitute();
-            var taxSvc = autoSub.Resolve<ITaxCalculationService>();
+            var taxSvc = autoSub.Resolve<TaxCalculationService>();
 
-            var (result, error) = await taxSvc.CalculateTaxAsync(Arg.Any<List<OrderItem>>(), Arg.Any<Guid>())
+            var (result, error) = await taxSvc.CalculateTaxAsync(null, Guid.NewGuid())
                 .ConfigureAwait(false);
 
             Assert.Null(result);
-            Assert.Null(error);
+            Assert.NotNull(error);
+            Assert.IsType<ServiceError>(error);
+            Assert.Contains("An error occurred while combining items", error.Message);
         }
     }
 }

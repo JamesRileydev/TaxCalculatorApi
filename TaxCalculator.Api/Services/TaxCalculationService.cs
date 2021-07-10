@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using TaxCalculator.Api.Data;
+using TaxCalculator.Api.Enums;
 using TaxCalculator.Api.Models;
 
 namespace TaxCalculator.Api.Services
@@ -14,9 +16,19 @@ namespace TaxCalculator.Api.Services
 
     public class TaxCalculationService : ITaxCalculationService
     {
+        private ILogger<TaxCalculationService> Log { get; }
+
+        private IMockRepository MockRepository { get; }
+
+        public TaxCalculationService(IMockRepository mockRepository, ILogger<TaxCalculationService> log)
+        {
+            MockRepository = mockRepository;
+            Log = log;
+        }
+
         public async Task<(Receipt, ServiceError)> CalculateTaxAsync(List<OrderItem> items, Guid id)
         {
-            IEnumerable combinedItems;
+            List<OrderItem> combinedItems;
 
             try
             {
@@ -24,11 +36,11 @@ namespace TaxCalculator.Api.Services
                 {
                     item.Quantity = items.Count(i => i.Equals(item));
                     return item;
-                });
+                }).ToList();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Log.LogError(ex, "[{id}] Failed to combine distinct items. See exception for details.", id);
                 return (null, new ServiceError
                 {
                     Exception = ex,
@@ -41,11 +53,45 @@ namespace TaxCalculator.Api.Services
 
             foreach (var item in combinedItems)
             {
+                var calculatedItem = item.Category switch
+                {
+                    _ when item.Category == ItemCategories.ExemptImport =>
+                        CalculateImportTax(item),
+                    _ when item.Category == ItemCategories.Basic =>
+                        CalculateBasicSalesTax(item),
+                    _ when item.Category == ItemCategories.BasicImport =>
+                        CalculateBasicSalesAndImportTax(item),
+                    _ when item.Category == ItemCategories.Exempt =>
+                        item,
+
+                    _ => null
+                };
+
+                if (calculatedItem is null)
+                {
+                    return (null, new ServiceError());
+                }
                 
+
             }
 
             await Task.CompletedTask;
             return (receipt, null);
+        }
+
+        private OrderItem CalculateBasicSalesTax(OrderItem item)
+        {
+            return item;
+        }
+
+        private OrderItem CalculateBasicSalesAndImportTax(OrderItem item)
+        {
+            return item;
+        }
+
+        private OrderItem CalculateImportTax(OrderItem item)
+        {
+            return item;
         }
     }
 }

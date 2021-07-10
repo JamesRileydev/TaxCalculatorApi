@@ -11,7 +11,7 @@ namespace TaxCalculator.Api.Data
     // Values that can change such as tax rates would be stored
     // in a database or some other common location that would 
     // be maintained by some other entity. In a real situation
-    // we would probably have a variety of tax rates base on the 
+    // we would probably have a variety of tax rates based on the 
     // customer and their location that would need to be retrieved.
     //
     // For the insert I'm assuming we are using a relational database
