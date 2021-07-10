@@ -17,13 +17,16 @@ namespace TaxCalculator.Api.Models
         [Required]
         [NotNull]
         public decimal Price { get; set; }
-        
+
         [Required]
         [NotNull]
         public int Quantity { get; set; }
 
         public decimal AggregatePrice => 
             Price * Quantity;
+
+        public decimal AggregateTotal =>
+            SalesTax + AggregatePrice;
 
         public decimal SalesTax { get; set; }
     }

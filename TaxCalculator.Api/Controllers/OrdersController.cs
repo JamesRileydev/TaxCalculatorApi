@@ -51,7 +51,7 @@ namespace TaxCalculator.Api.Controllers
 
 
         [NonAction]
-        private IActionResult ErrorJsonResult(ServiceError error)
+        private IActionResult ErrorJsonResult(IServiceError error)
         {
             return new JsonResult(error, SerializerOptions)
             {
