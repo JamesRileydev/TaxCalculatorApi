@@ -16,21 +16,6 @@ namespace TaxCalculator.Api.Tests.Unit
     public class TaxCalculationServiceUnitTests
     {
         [Fact]
-        public async Task CalculateTaxAsync_ReturnsServiceError_WhenLINQThrows()
-        {
-            var autoSub = new AutoSubstitute();
-            var sut = autoSub.Resolve<TaxCalculationService>();
-
-            var (result, error) = await sut.CalculateTaxAsync(new Order())
-                .ConfigureAwait(false);
-
-            Assert.Null(result);
-            Assert.NotNull(error);
-            Assert.IsType<ServiceError>(error);
-            Assert.Contains("An error occurred while combining items", error.Message);
-        }
-
-        [Fact]
         public async Task CalculateTaxAsync_ReturnsServiceError_WhenMockRepoThrowsWhileGettingTaxRates()
         {
             var autoSub = new AutoSubstitute();
@@ -77,7 +62,12 @@ namespace TaxCalculator.Api.Tests.Unit
                     Category = ItemCategories.Unknown,
                     Price = 1.00m
                 }}),
-                CombinedItems = new List<OrderItem>(new List<OrderItem>())
+                CombinedItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
+                {
+                    Name = "Name",
+                    Category = ItemCategories.Unknown,
+                    Price = 1.00m
+                }})
             };
 
             var autoSub = new AutoSubstitute();
@@ -100,13 +90,13 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var order = new Order
             {
-                OrderItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
+                CombinedItems = new List<OrderItem>{new OrderItem
                 {
                     Name = "Name",
                     Category = ItemCategories.Basic,
-                    Price = 10.00m
-                }}),
-                CombinedItems = new List<OrderItem>(new List<OrderItem>())
+                    Price = 10.00m,
+                    Quantity = 1
+                }},
             };
 
             var autoSub = new AutoSubstitute();
@@ -131,13 +121,13 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var order = new Order
             {
-                OrderItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
+                CombinedItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
                 {
                     Name = "Name",
                     Category = ItemCategories.ExemptImport,
-                    Price = 10.00m
-                }}),
-                CombinedItems = new List<OrderItem>(new List<OrderItem>())
+                    Price = 10.00m,
+                    Quantity = 1
+                    }}),
             };
 
             var autoSub = new AutoSubstitute();
@@ -162,13 +152,13 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var order = new Order
             {
-                OrderItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
+                CombinedItems = new List<OrderItem>{new OrderItem
                 {
                     Name = "Name",
                     Category = ItemCategories.BasicImport,
-                    Price = 10.00m
-                }}),
-                CombinedItems = new List<OrderItem>(new List<OrderItem>())
+                    Price = 10.00m,
+                    Quantity = 2
+                }},
             };
 
             var autoSub = new AutoSubstitute();
@@ -184,9 +174,8 @@ namespace TaxCalculator.Api.Tests.Unit
             Assert.NotNull(result);
 
             Assert.IsType<Receipt>(result);
-            Assert.Single(result.OrderItems);
-            Assert.Equal(1.50m, result.Tax);
-            Assert.Equal(11.50m, result.Total);
+            Assert.Equal(3.0m, result.Tax);
+            Assert.Equal(23.00m, result.Total);
         }
 
         [Fact]
@@ -194,13 +183,13 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var order = new Order
             {
-                OrderItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
+                CombinedItems = new List<OrderItem>{new OrderItem
                 {
                     Name = "Name",
                     Category = ItemCategories.Exempt,
-                    Price = 10.00m
-                }}),
-                CombinedItems = new List<OrderItem>(new List<OrderItem>())
+                    Price = 10.00m,
+                    Quantity = 1
+                }},
             };
 
             var autoSub = new AutoSubstitute();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutofacContrib.NSubstitute;
 using Microsoft.AspNetCore.Http;
@@ -43,9 +44,31 @@ namespace TaxCalculator.Api.Tests.Unit
         }
 
         [Fact]
+        public async Task PlaceOrder_Return500Error_WhenOrderCreationServiceFails()
+        {
+            var autoSub = new AutoSubstitute();
+
+            var orderCreationSvc = autoSub.Resolve<IOrderCreationService>();
+            orderCreationSvc.CreateAndInsertOrderAsync(Arg.Any<List<OrderItem>>(), Arg.Any<Guid>())
+                .Returns((null, new ServiceError()));
+
+            var sut = autoSub.Resolve<OrdersController>();
+            var result = await sut.ProcessOrder(new List<OrderItem>{new()}).ConfigureAwait(false);
+
+            Assert.NotNull(result);
+            var error = Assert.IsType<JsonResult>(result);
+            Assert.Equal(StatusCodes.Status500InternalServerError, error.StatusCode);
+        }
+
+        [Fact]
         public async Task PlaceOrder_Return500Error_WhenCalculateTaxAsyncFails()
         {
             var autoSub = new AutoSubstitute();
+
+            var orderCreationSvc = autoSub.Resolve<IOrderCreationService>();
+            orderCreationSvc.CreateAndInsertOrderAsync(Arg.Any<List<OrderItem>>(), Arg.Any<Guid>())
+                .Returns((new Order(), null));
+
             var taxCalcSvc = autoSub.Resolve<ITaxCalculationService>();
             taxCalcSvc.CalculateTaxAsync(Arg.Any<Order>())
                 .Returns((null, new ServiceError()));

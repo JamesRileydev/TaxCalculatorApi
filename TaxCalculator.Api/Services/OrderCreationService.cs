@@ -29,7 +29,7 @@ namespace TaxCalculator.Api.Services
 
         public async Task<(Order,IServiceError)> CreateAndInsertOrderAsync(List<OrderItem> orderItems, Guid id)
         {
-            Log.LogInformation($"[{id}] Method {nameof(CreateAndInsertOrderAsync)} received an order items, will attempt to create order " +
+            Log.LogInformation($"[{id}] Method {nameof(CreateAndInsertOrderAsync)} received order items, will attempt to create order " +
                                "and insert into long term storage.");
 
             List<OrderItem> combinedItems;
@@ -59,7 +59,7 @@ namespace TaxCalculator.Api.Services
                 CombinedItems = combinedItems
             };
 
-            uint result;
+            int result;
             // This method doesn't throw, but in an actual application it could.
             try
             {
