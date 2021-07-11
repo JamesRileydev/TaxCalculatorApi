@@ -1,0 +1,100 @@
+Invalid Input - Empty Array:
+[]
+
+Invalid Input -  Invalid Request:
+[
+	{
+	"name": "Book",
+	"price" : 12.49,
+	"category" :  1,
+	"quantity" : 2
+	},
+	{
+	"name": "Book",
+	"price" : 0,
+	"category" :  1,
+	"quantity" : 1
+	},
+	{
+	"price" : 10.00,
+	"quantity" : 1
+	}
+]
+
+Input 1:
+[
+	{
+	"name": "Book",
+	"price" : 12.49,
+	"category" :  1,
+	"quantity" : 1
+	},
+	{
+	"name": "Book",
+	"price" : 12.49,
+	"category" :  1,
+	"quantity" : 1
+	},
+	{
+	"name": "Music CD",
+	"price" : 14.99,
+	"category" :  3,
+	"quantity" : 1
+	},
+		{
+	"name": "Chocolate bar",
+	"price" : 0.85,
+	"category" :  1,
+	"quantity" : 1
+	}
+]
+
+Input 2:
+[
+		{
+	"name": "Imported box of chocolates",
+	"price" : 10.00,
+	"category" :  2,
+	"quantity" : 1
+	},
+	{
+	"name": "Imported bottle of perfume",
+	"price" : 47.50,
+	"category" :  4,
+	"quantity" : 1
+	}
+]
+
+Input 3:
+[
+	{
+	"name": "Imported bottle of perfume",
+	"price" : 27.99,
+	"category" :  4,
+	"quantity" : 1
+	},
+	{
+	"name": "Bottle of perfume",
+	"price" : 18.99,
+	"category" :  3,
+	"quantity" : 1
+	},
+	{
+	"name": "Packet of headache pills",
+	"price" : 9.75,
+	"category" :  1,
+	"quantity" : 1
+	},
+	{
+	"name": "Imported box of chocolates",
+	"price" : 11.25,
+	"category" :  2,
+	"quantity" : 1
+	},
+	{
+	"name": "Imported box of chocolates",
+	"price" : 11.25,
+	"category" :  2,
+	"quantity" : 1
+	}
+]
