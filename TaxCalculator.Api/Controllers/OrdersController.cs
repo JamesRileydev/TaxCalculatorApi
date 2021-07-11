@@ -4,6 +4,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using TaxCalculator.Api.Models;
 using TaxCalculator.Api.Services;
 
@@ -19,11 +20,14 @@ namespace TaxCalculator.Api.Controllers
             WriteIndented = false
         };
 
-        public ITaxCalculationService TaxCalculationSvc { get; }
+        public ILogger<OrdersController> Log { get; }
 
-        public OrdersController(ITaxCalculationService taxCalculationSvc)
+        public ITaxCalculationService TaxCalculationSvc { get; }
+        
+        public OrdersController(ITaxCalculationService taxCalculationSvc, ILogger<OrdersController> log)
         {
             TaxCalculationSvc = taxCalculationSvc;
+            Log = log;
         }
 
         // This is here for testing purposes.
@@ -48,6 +52,8 @@ namespace TaxCalculator.Api.Controllers
 
             var id = Guid.NewGuid();
 
+            Log.LogInformation($"[{id}] Received order with {orderItems.Count} items");
+            
             var order = new Order
             {
                 OrderId = id,

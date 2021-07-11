@@ -26,9 +26,12 @@ namespace TaxCalculator.Api.Services
             Log = log;
         }
 
-        //This method may be more appropriately called GenerateReceiptAsync since that is what will be returned.
+        // This method may be more appropriately called GenerateReceiptAsync since that is what will be returned.
+        // This service would more than likely be two service, one for calculating tax, another for receipt generation.
         public async Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order)
         {
+            Log.LogInformation($"[{order.OrderId}] Method {nameof(CalculateTaxAsync)} received an order will attempt to calculate tax.");
+
             List<OrderItem> combinedItems;
             try
             {
@@ -68,10 +71,12 @@ namespace TaxCalculator.Api.Services
 
             if (basicTaxRate == 0 || importTaxRate == 0)
             {
-                Log.LogError("[{id}] One or more values were not returned while retrieving the tax rates.", order.OrderId);
+                Log.LogError("[{id}] One or more values were not returned while retrieving the tax rates. " +
+                             "Order will not be processed", order.OrderId);
                 return (null, new ServiceError
                 {
-                    Message = "One or more values were not returned while retrieving the tax rates."
+                    Message = "One or more values were not returned while retrieving the tax rates." +
+                              "Order will not be processed"
                 });
             }
 
@@ -83,6 +88,8 @@ namespace TaxCalculator.Api.Services
             {
                 return (null, error);
             }
+
+            Log.LogInformation($"[{order.OrderId}] Successfully calculated taxes, returning receipt.");
 
             return (receipt, null);
         }
@@ -107,7 +114,8 @@ namespace TaxCalculator.Api.Services
                     _ => null
                 };
 
-                //This probably wouldn't happen due to the data validation, but its good have
+                // This probably wouldn't happen due to the data validation,
+                // but it's good have to check anyway.
                 if (calculatedItem is null)
                 {
                     return (null, new ServiceError
