@@ -1,6 +1,6 @@
 # TaxCalculator API
 
-The application is written in .NET 5.0 using C# 9. \
+The application is written in .NET 5.0 using C# 9 and Visual Studio 2019 Community Edition \
 This application will accept a JSON in an array and return the item totals, sales taxes, and total for the order in JSON format
 
 
