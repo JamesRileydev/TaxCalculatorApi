@@ -30,6 +30,7 @@ URL: http://localhost:9090/api/orders
 	"name": "Book",
 	"price" : 12.49,
 	"category" :  1
+    }
 ]
 ```
 #### Using CURL:
