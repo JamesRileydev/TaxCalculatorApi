@@ -14,7 +14,7 @@ Build the solution
 ---
 ***NOTE***
 
-#####  It The category is an ENUM and the options are as follows:
+#####  The "category" is an ENUM and the options are as follows:
 Tax Exempt = 1 \
 Tax Exempt Import = 2 \
 Basic Tax = 3 \
