@@ -27,6 +27,8 @@ namespace TaxCalculator.Api.Controllers
             TaxCalculationSvc = taxCalculationSvc;
         }
 
+        // This is here for testing purposes.
+        // You can navigate to http://localhost:9090/api/orders to see the message
         public async Task<IActionResult> Index()
         {
             await Task.CompletedTask;
@@ -34,7 +36,7 @@ namespace TaxCalculator.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlaceOrder([FromBody] List<OrderItem> orderItems)
+        public async Task<IActionResult> ProcessOrder([FromBody] List<OrderItem> orderItems)
         {
             if (!ModelState.IsValid || orderItems.Count == 0)
             {

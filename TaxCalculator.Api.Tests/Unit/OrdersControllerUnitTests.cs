@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutofacContrib.NSubstitute;
 using Microsoft.AspNetCore.Http;
@@ -16,14 +15,27 @@ namespace TaxCalculator.Api.Tests.Unit
     public class OrdersControllerUnitTests
     {
         [Fact]
+        public async Task GetIndex_Returns_Message()
+        {
+            var autoSub = new AutoSubstitute();
+            var sut = autoSub.Resolve<OrdersController>();
+
+            var result = await sut.Index();
+            
+            Assert.NotNull(result);
+            var response = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(StatusCodes.Status200OK, response.StatusCode);
+        }
+        
+        [Fact]
         public async Task PlaceOrder_Returns400BadRequest_WhenJsonIsInvalid()
         {
             var autoSub = new AutoSubstitute();
-            var controller = autoSub.Resolve<OrdersController>();
+            var sut = autoSub.Resolve<OrdersController>();
 
             var itemList = new List<OrderItem>();
 
-            var result = await controller.PlaceOrder(itemList);
+            var result = await sut.ProcessOrder(itemList);
             
             Assert.NotNull(result);
             var error = Assert.IsType<JsonResult>(result);
@@ -35,11 +47,11 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var autoSub = new AutoSubstitute();
             var taxCalcSvc = autoSub.Resolve<ITaxCalculationService>();
-            taxCalcSvc.CalculateTaxAsync(Arg.Any<List<OrderItem>>(), Arg.Any<Guid>())
+            taxCalcSvc.CalculateTaxAsync(Arg.Any<Order>())
                 .Returns((null, new ServiceError()));
 
-            var controller = autoSub.Resolve<OrdersController>();
-            var result = await controller.PlaceOrder(new List<OrderItem>{new()}).ConfigureAwait(false);
+            var sut = autoSub.Resolve<OrdersController>();
+            var result = await sut.ProcessOrder(new List<OrderItem>{new()}).ConfigureAwait(false);
 
             Assert.NotNull(result);
             var error = Assert.IsType<JsonResult>(result);
@@ -51,15 +63,15 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var autoSub = new AutoSubstitute();
             var taxCalcSvc = autoSub.Resolve<ITaxCalculationService>();
-            taxCalcSvc.CalculateTaxAsync(Arg.Any<List<OrderItem>>(), Arg.Any<Guid>())
+            taxCalcSvc.CalculateTaxAsync(Arg.Any<Order>())
                 .Returns((new Receipt(), null));
 
-            var controller = autoSub.Resolve<OrdersController>();
-            var result = await controller.PlaceOrder(new List<OrderItem>{new()}).ConfigureAwait(false);
+            var sut = autoSub.Resolve<OrdersController>();
+            var result = await sut.ProcessOrder(new List<OrderItem>{new()}).ConfigureAwait(false);
 
             Assert.NotNull(result);
-            var error = Assert.IsType<JsonResult>(result);
-            Assert.Equal(StatusCodes.Status201Created, error.StatusCode);
+            var response = Assert.IsType<JsonResult>(result);
+            Assert.Equal(StatusCodes.Status201Created, response.StatusCode);
         }
     }
 }
