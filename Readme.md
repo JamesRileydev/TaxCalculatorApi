@@ -7,7 +7,9 @@ This application will accept a JSON in an array and return the item totals, sale
 ## Installation
 Ensure the .NET 5.0 SDK is installed on your machine \
 Download the repository and open the solution with Visual Studio 2019 \
-Build the solution
+Build the solution \
+\
+The repository contains a "Files" directory which contains all of the required sample input request, as well as requests to test validation
 
 
 ## Example Usage
