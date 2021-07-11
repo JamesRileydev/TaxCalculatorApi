@@ -149,7 +149,7 @@ namespace TaxCalculator.Api.Services
 
                 receipt.Tax += calculatedItem.SalesTaxEach * calculatedItem.Quantity;
                 receipt.Total += calculatedItem.AggregateTotal;
-                receipt.OrderItems.Add(calculatedItem.ToString());
+                receipt.OrderItems.Add(calculatedItem.CreateItemDescription());
             }
 
             await Task.CompletedTask;
