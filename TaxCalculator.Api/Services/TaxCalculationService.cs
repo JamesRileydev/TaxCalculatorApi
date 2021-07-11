@@ -12,7 +12,7 @@ namespace TaxCalculator.Api.Services
 {
     public interface ITaxCalculationService
     {
-        public Task<(Receipt, IServiceError)> CalculateTaxAsync(List<OrderItem> items, Guid id);
+        public Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order);
     }
 
     public class TaxCalculationService : ITaxCalculationService
@@ -28,85 +28,55 @@ namespace TaxCalculator.Api.Services
         }
 
         //This method may be more appropriately called GenerateReceiptAsync since that is what will be returned.
-        public async Task<(Receipt, IServiceError)> CalculateTaxAsync(List<OrderItem> items, Guid id)
+        public async Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order)
         {
             List<OrderItem> combinedItems;
             try
             {
-                combinedItems = items.Distinct().ToList().Select(item =>
+                combinedItems = order.OrderItems.Distinct().ToList().Select(item =>
                 {
-                    item.Quantity = items.Count(i => i.Equals(item));
+                    item.Quantity = order.OrderItems.Count(i => i.Equals(item));
                     return item;
                 }).ToList();
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, "[{id}] Failed to combine distinct items. See exception for details.", id);
+                Log.LogError(ex, "[{id}] Failed to combine distinct items. See exception for details.", order.OrderId);
                 return (null, new ServiceError
                 {
                     Exception = ex,
-                    Message = $"An error occurred while combining items for order ID: {id}." +
+                    Message = $"An error occurred while combining items for order ID: {order.OrderId}." +
                               " See exception for more details."
                 });
             }
 
-            decimal basicTaxRate;
+            decimal basicTaxRate, importTaxRate;
             try
             {
                 // This method doesn't throw, but in an actual application it could.
-                basicTaxRate = await MockRepository.GetBasicSalesTaxRateAsync().ConfigureAwait(false);
+                (basicTaxRate, importTaxRate) = await MockRepository.GetTaxRatesAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, "[{id}] An error occurred while retrieving the basic tax rate. See exception for details.", id);
+                Log.LogError(ex, "[{id}] An error occurred while retrieving tax rates. See exception for details.", order.OrderId);
                 return (null, new ServiceError
                 {
                     Exception = ex,
-                    Message = $"An error occurred while retrieving the basic tax rate for order ID: {id}." +
+                    Message = $"An error occurred while retrieving tax rates for order ID: {order.OrderId}." +
                               " See exception for more details."
                 });
             }
 
-            if (basicTaxRate is 0)
+            if (basicTaxRate == 0 || importTaxRate == 0)
             {
-                Log.LogError("[{id}] A value was not returned while retrieving the Basic Tax rate", id);
+                Log.LogError("[{id}] One or more values were not returned while retrieving the tax rates.", order.OrderId);
                 return (null, new ServiceError
                 {
-                    Message = "A value was not returned while retrieving the Basic Tax rate."
+                    Message = "One or more values were not returned while retrieving the tax rates."
                 });
             }
 
-            decimal importTaxRate;
-            try
-            {
-                // This method doesn't throw, but in an actual application it could.
-                importTaxRate = await MockRepository.GetImportTaxRateAsync().ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "[{id}] An error occurred while retrieving the import tax rate. See exception for details.", id);
-                return (null, new ServiceError
-                {
-                    Exception = ex,
-                    Message = $"An error occurred while retrieving the import tax rate for order ID: {id}." +
-                              " See exception for more details."
-                });
-            }
-
-            if (importTaxRate is 0)
-            {
-                Log.LogError("[{id}] A value was not returned while retrieving the Import Tax rate", id);
-                return (null, new ServiceError
-                {
-                    Message = "A value was not returned while retrieving the Import Tax rate."
-                });
-            }
-
-            var order = new Order
-            {
-                OrderId = id,
-                OrderItems = combinedItems
-            };
+            order.CombinedItems = combinedItems;
 
             var (receipt, error) = await CalculateTaxAsync(order, basicTaxRate, importTaxRate).ConfigureAwait(false);
 
@@ -123,7 +93,7 @@ namespace TaxCalculator.Api.Services
             //TODO - Move receipt generation to its own method/service
             var receipt = new Receipt();
 
-            foreach (var item in order.OrderItems)
+            foreach (var item in order.CombinedItems)
             {
                 var calculatedItem = item.Category switch
                 {
@@ -158,35 +128,36 @@ namespace TaxCalculator.Api.Services
 
         private OrderItem CalculateBasicSalesTax(OrderItem item, decimal basicTaxRate)
         {
-            var tax = item.Price * (basicTaxRate / 100);
-            var roundedTax = Math.Ceiling(tax * 20) / 20;
+            var basicTax = CalculateTax(item.Price, basicTaxRate);
 
-            item.SalesTaxEach = roundedTax;
+            item.SalesTaxEach = basicTax;
 
             return item;
         }
 
         private OrderItem CalculateBasicSalesAndImportTax(OrderItem item, decimal basicTaxRate, decimal importTaxRate)
         {
-            var basicTax = item.Price * (basicTaxRate / 100);
-            var basicRoundedTax = Math.Ceiling(basicTax * 20) / 20;
+            var basicTax = CalculateTax(item.Price, basicTaxRate);
+            var importTax = CalculateTax(item.Price, importTaxRate);
 
-            var importTax = item.Price * (importTaxRate / 100);
-            var importRoundedTax = Math.Ceiling(importTax * 20) / 20;
-
-            item.SalesTaxEach = basicRoundedTax + importRoundedTax;
+            item.SalesTaxEach = basicTax + importTax;
 
             return item;
         }
 
         private OrderItem CalculateImportTax(OrderItem item, decimal importTaxRate)
         {
-            var importTax = item.Price * (importTaxRate / 100);
-            var importRoundedTax = Math.Ceiling(importTax * 20) / 20;
+            var importTax = CalculateTax(item.Price, importTaxRate);
 
-            item.SalesTaxEach = importRoundedTax;
+            item.SalesTaxEach = importTax;
 
             return item;
+        }
+
+        private decimal CalculateTax(decimal price, decimal taxRate)
+        {
+            var tax = price * (taxRate / 100);
+            return Math.Ceiling(tax * 20) / 20;
         }
     }
 }

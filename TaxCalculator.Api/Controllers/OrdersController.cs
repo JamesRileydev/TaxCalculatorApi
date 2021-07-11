@@ -34,9 +34,9 @@ namespace TaxCalculator.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PlaceOrder([FromBody] List<OrderItem> order)
+        public async Task<IActionResult> PlaceOrder([FromBody] List<OrderItem> orderItems)
         {
-            if (!ModelState.IsValid || order.Count == 0)
+            if (!ModelState.IsValid || orderItems.Count == 0)
             {
                 return ErrorJsonResult(HttpStatusCode.BadRequest,
                     new ServiceError
@@ -47,7 +47,13 @@ namespace TaxCalculator.Api.Controllers
 
             var id = Guid.NewGuid();
 
-            var (result, error) = await TaxCalculationSvc.CalculateTaxAsync(order, id).ConfigureAwait(false);
+            var order = new Order
+            {
+                OrderId = id,
+                OrderItems = orderItems
+            };
+
+            var (result, error) = await TaxCalculationSvc.CalculateTaxAsync(order).ConfigureAwait(false);
 
             if (error is not null)
             {
