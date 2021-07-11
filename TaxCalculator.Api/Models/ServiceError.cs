@@ -19,6 +19,4 @@ namespace TaxCalculator.Api.Models
         [JsonConverter(typeof(ExceptionConverter))]
         public Exception Exception { get; set; }
     }
-
-    public class NotImplementedError : ServiceError{ }
 }

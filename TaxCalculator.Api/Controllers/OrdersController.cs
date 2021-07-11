@@ -87,8 +87,8 @@ namespace TaxCalculator.Api.Controllers
             {
                 Id = result.OrderId,
                 result.OrderItems,
-                SalesTaxes = result.Tax,
-                result.Total
+                SalesTaxes = $"{result.Tax:.00}",
+                Total = $"{result.Total:.00}"
             }, SerializerOptions)
             {
                 StatusCode = (int)HttpStatusCode.Created
