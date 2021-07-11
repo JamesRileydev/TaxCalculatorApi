@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -90,8 +89,7 @@ namespace TaxCalculator.Api.Services
 
         private async Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order, decimal basicTaxRate, decimal importTaxRate)
         {
-            //TODO - Move receipt generation to its own method/service
-            var receipt = new Receipt();
+            var receipt = new Receipt { OrderId = order.OrderId };
 
             foreach (var item in order.CombinedItems)
             {
@@ -109,6 +107,7 @@ namespace TaxCalculator.Api.Services
                     _ => null
                 };
 
+                //This probably wouldn't happen due to the data validation, but its good have
                 if (calculatedItem is null)
                 {
                     return (null, new ServiceError

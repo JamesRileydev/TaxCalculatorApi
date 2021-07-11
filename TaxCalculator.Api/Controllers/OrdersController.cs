@@ -16,7 +16,6 @@ namespace TaxCalculator.Api.Controllers
         private JsonSerializerOptions SerializerOptions { get; } = new()
         {
             PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false
         };
 
@@ -62,7 +61,7 @@ namespace TaxCalculator.Api.Controllers
                 return ErrorJsonResult(HttpStatusCode.InternalServerError, error);
             }
 
-            return CreatedJsonResult(result, id);
+            return CreatedJsonResult(result);
         }
 
 
@@ -76,13 +75,13 @@ namespace TaxCalculator.Api.Controllers
         }
         
         [NonAction]
-        private IActionResult CreatedJsonResult(Receipt result, Guid id)
+        private IActionResult CreatedJsonResult(Receipt result)
         {
             return new JsonResult(new
             {
-                id,
+                Id = result.OrderId,
                 result.OrderItems,
-                result.Tax,
+                SalesTaxes = result.Tax,
                 result.Total
             }, SerializerOptions)
             {

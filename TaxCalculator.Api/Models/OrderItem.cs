@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using TaxCalculator.Api.Enums;
 
 namespace TaxCalculator.Api.Models
@@ -42,7 +41,8 @@ namespace TaxCalculator.Api.Models
 
             if (Price <= 0)
             {
-                yield return new ValidationResult("Item must have a 'price' key, with a value greater than zero.");
+                yield return new ValidationResult("Item must have a 'price' key," +
+                                                  " with a decimal value greater than zero.");
             }
 
             if (Category is < (ItemCategories)1 or > (ItemCategories)4)
@@ -53,7 +53,7 @@ namespace TaxCalculator.Api.Models
             if (Quantity > 1)
             {
                 yield return new ValidationResult(
-                    "Item 'quantity' is assumed to be 1 and should not be included, " +
+                    "Item 'quantity' is assumed to be 1 and does not be included, " +
                     "add duplicate items for multiples of the same item");
             }
         }
