@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TaxCalculator.Api.Data;
@@ -26,31 +24,10 @@ namespace TaxCalculator.Api.Services
             Log = log;
         }
 
-        // This method may be more appropriately called GenerateReceiptAsync since that is what will be returned.
-        // This service would more than likely be two service, one for calculating tax, another for receipt generation.
+        // This service would more than likely be two services, one for calculating tax, another for receipt generation.
         public async Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order)
         {
             Log.LogInformation($"[{order.OrderId}] Method {nameof(CalculateTaxAsync)} received an order will attempt to calculate tax.");
-
-            List<OrderItem> combinedItems;
-            try
-            {
-                combinedItems = order.OrderItems.Distinct().ToList().Select(item =>
-                {
-                    item.Quantity = order.OrderItems.Count(i => i.Equals(item));
-                    return item;
-                }).ToList();
-            }
-            catch (Exception ex)
-            {
-                Log.LogError(ex, "[{id}] Failed to combine distinct items. See exception for details.", order.OrderId);
-                return (null, new ServiceError
-                {
-                    Exception = ex,
-                    Message = $"An error occurred while combining items for order ID: {order.OrderId}." +
-                              " See exception for more details."
-                });
-            }
 
             decimal basicTaxRate, importTaxRate;
             try
@@ -79,8 +56,6 @@ namespace TaxCalculator.Api.Services
                               "Order will not be processed"
                 });
             }
-
-            order.CombinedItems = combinedItems;
 
             var (receipt, error) = await CalculateTaxAsync(order, basicTaxRate, importTaxRate).ConfigureAwait(false);
 

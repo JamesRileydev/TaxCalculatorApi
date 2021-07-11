@@ -22,12 +22,15 @@ namespace TaxCalculator.Api.Controllers
 
         public ILogger<OrdersController> Log { get; }
 
+        private IOrderCreationService OrderCreationSvc { get; }
+
         public ITaxCalculationService TaxCalculationSvc { get; }
         
-        public OrdersController(ITaxCalculationService taxCalculationSvc, ILogger<OrdersController> log)
+        public OrdersController(ITaxCalculationService taxCalculationSvc, ILogger<OrdersController> log, IOrderCreationService orderCreationSvc)
         {
-            TaxCalculationSvc = taxCalculationSvc;
             Log = log;
+            TaxCalculationSvc = taxCalculationSvc;
+            OrderCreationSvc = orderCreationSvc;
         }
 
         // This is here for testing purposes.
@@ -53,12 +56,14 @@ namespace TaxCalculator.Api.Controllers
             var id = Guid.NewGuid();
 
             Log.LogInformation($"[{id}] Received order with {orderItems.Count} items");
-            
-            var order = new Order
+
+            var (order, orderError) = await OrderCreationSvc.CreateAndInsertOrderAsync(orderItems, id)
+                .ConfigureAwait(false);
+
+            if (orderError is not null)
             {
-                OrderId = id,
-                OrderItems = orderItems
-            };
+                return ErrorJsonResult(HttpStatusCode.InternalServerError, orderError);
+            }
 
             var (result, error) = await TaxCalculationSvc.CalculateTaxAsync(order).ConfigureAwait(false);
 

@@ -21,7 +21,7 @@ namespace TaxCalculator.Api.Data
     {
         Task<(int, int)> GetTaxRatesAsync();
 
-        Task<long> InsertOrderAsync(Order order);
+        Task<uint> InsertOrderAsync(Order order);
     }
     public class MockRepository : IMockRepository
     {
@@ -34,7 +34,7 @@ namespace TaxCalculator.Api.Data
             return (basicTaxRate, importTaxRate);
         }
 
-        public async Task<long> InsertOrderAsync(Order order)
+        public async Task<uint> InsertOrderAsync(Order order)
         {
             // For this I'm assuming the insert was successful
             // If this were an actual insert I might return the

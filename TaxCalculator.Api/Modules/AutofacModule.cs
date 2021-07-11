@@ -16,6 +16,10 @@ namespace TaxCalculator.Api.Modules
             builder.RegisterType<MockRepository>()
                 .AsImplementedInterfaces()
                 .SingleInstance();
+
+            builder.RegisterType<OrderCreationService>()
+                .AsImplementedInterfaces()
+                .SingleInstance();
         }
     }
 }
