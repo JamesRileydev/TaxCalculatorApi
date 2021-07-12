@@ -25,7 +25,8 @@ Basic and Import Tax = 4
 ---
 
 #### Using Insomia or Postman:
-URL: http://localhost:9090/api/orders
+URL: http://localhost:9090/api/orders \
+POST request
 ```Json
 [
 	{
