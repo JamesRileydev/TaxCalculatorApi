@@ -7,6 +7,7 @@ using TaxCalculator.Api.Models;
 
 namespace TaxCalculator.Api.Services
 {
+    // This service would more than likely be two services, one for calculating tax, another for receipt generation.
     public interface ITaxCalculationService
     {
         public Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order);
@@ -24,10 +25,9 @@ namespace TaxCalculator.Api.Services
             Log = log;
         }
 
-        // This service would more than likely be two services, one for calculating tax, another for receipt generation.
         public async Task<(Receipt, IServiceError)> CalculateTaxAsync(Order order)
         {
-            Log.LogInformation($"[{order.OrderId}] Method {nameof(CalculateTaxAsync)} received an order will attempt to calculate tax.");
+            Log.LogInformation($"[{order.OrderId}] Method {nameof(CalculateTaxAsync)} received an order, will attempt to calculate tax.");
 
             decimal basicTaxRate, importTaxRate;
             try
@@ -37,23 +37,23 @@ namespace TaxCalculator.Api.Services
             }
             catch (Exception ex)
             {
-                Log.LogError(ex, "[{id}] An error occurred while retrieving tax rates. See exception for details.", order.OrderId);
+                Log.LogError(ex, $"[{order.OrderId}] An error occurred while retrieving tax rates. See exception for details.");
                 return (null, new ServiceError
                 {
                     Exception = ex,
-                    Message = $"An error occurred while retrieving tax rates for order ID: {order.OrderId}." +
-                              " See exception for more details."
+                    Message = $"An error occurred while retrieving tax rates for order ID: {order.OrderId}. " +
+                              "See exception for more details."
                 });
             }
 
             if (basicTaxRate == 0 || importTaxRate == 0)
             {
-                Log.LogError("[{id}] One or more values were not returned while retrieving the tax rates. " +
-                             "Order will not be processed", order.OrderId);
+                Log.LogError($"[{order.OrderId}] One or more values were not returned while retrieving the tax rates. " +
+                             "Order will not be processed.");
                 return (null, new ServiceError
                 {
-                    Message = "One or more values were not returned while retrieving the tax rates." +
-                              "Order will not be processed"
+                    Message = "One or more values were not returned while retrieving the tax rates. " +
+                              "Order will not be processed."
                 });
             }
 
@@ -95,7 +95,8 @@ namespace TaxCalculator.Api.Services
                 {
                     return (null, new ServiceError
                     {
-                        Message = $"Unable to calculate tax for item category: {item.Category}"
+                        Message = $"Unable to calculate tax for item category: {item.Category}. " +
+                                  "Please verify accuracy of payload."
                     });
                 }
 

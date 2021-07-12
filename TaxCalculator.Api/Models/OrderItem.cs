@@ -22,14 +22,13 @@ namespace TaxCalculator.Api.Models
         public decimal AggregateTotal =>
             AggregateTotalEach * Quantity;
 
+        // Since an actual receipt would contain more information, it would be better to do this with StringBuilder
+        // in a ReceiptBuilderService
         public string CreateItemDescription()
         {
-            if (Quantity > 1)
-            {
-                return $"{Name}: {AggregateTotal} ({Quantity} @ {AggregateTotalEach})";
-            }
-
-            return $"{Name}: {AggregateTotal}";
+            return Quantity > 1 ?
+                $"{Name}: {AggregateTotal} ({Quantity} @ {AggregateTotalEach})" :
+                $"{Name}: {AggregateTotal}";
         }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -47,7 +46,7 @@ namespace TaxCalculator.Api.Models
 
             if (Category is < (ItemCategories)1 or > (ItemCategories)4)
             {
-                yield return new ValidationResult("Item must have a 'category' key, with a value between 1 and 4.");
+                yield return new ValidationResult("Item must have a 'category' key, with an integer value between 1 and 4.");
             }
 
             if (Quantity > 1)

@@ -20,7 +20,7 @@ namespace TaxCalculator.Api.Controllers
             WriteIndented = false
         };
 
-        public ILogger<OrdersController> Log { get; }
+        private ILogger<OrdersController> Log { get; }
 
         private IOrderCreationService OrderCreationSvc { get; }
 
@@ -53,6 +53,7 @@ namespace TaxCalculator.Api.Controllers
                     });
             }
 
+            // I included the Guid to use as a correlation ID to track the order through the application
             var id = Guid.NewGuid();
 
             Log.LogInformation($"[{id}] Received order with {orderItems.Count} items");
@@ -74,7 +75,6 @@ namespace TaxCalculator.Api.Controllers
 
             return CreatedJsonResult(result);
         }
-
 
         [NonAction]
         private IActionResult ErrorJsonResult(HttpStatusCode status , IServiceError error)
