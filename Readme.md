@@ -52,10 +52,10 @@ curl --request POST \
 #### Example Response:
 ```Json
 {
-  "Id": "4f2c949a-e123-4eb1-83fe-8a973ae7a06a",
-  "OrderItems": [
-    "Book: 12.49"
-  ],
-  "SalesTaxes": 0,
-  "Total": 12.49
+    "Id": "12b7c040-787c-4e6f-9df1-e225acf60a48",
+    "OrderItems": [
+        "Book: 12.49"
+    ],
+    "SalesTaxes": "0.00",
+    "Total": "12.49"
 }
