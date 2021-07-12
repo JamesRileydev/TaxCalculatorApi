@@ -56,12 +56,6 @@ namespace TaxCalculator.Api.Tests.Unit
         {
             var order = new Order
             {
-                OrderItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
-                {
-                    Name = "Name",
-                    Category = ItemCategories.Unknown,
-                    Price = 1.00m
-                }}),
                 CombinedItems = new List<OrderItem>(new List<OrderItem>{new OrderItem
                 {
                     Name = "Name",
@@ -126,7 +120,7 @@ namespace TaxCalculator.Api.Tests.Unit
                     Name = "Name",
                     Category = ItemCategories.ExemptImport,
                     Price = 10.00m,
-                    Quantity = 1
+                    Quantity = 2
                     }}),
             };
 
@@ -143,8 +137,8 @@ namespace TaxCalculator.Api.Tests.Unit
             Assert.NotNull(result);
 
             Assert.IsType<Receipt>(result);
-            Assert.Equal(0.50m, result.Tax);
-            Assert.Equal(10.50m, result.Total);
+            Assert.Equal(1.00m, result.Tax);
+            Assert.Equal(21.00m, result.Total);
         }
 
         [Fact]
