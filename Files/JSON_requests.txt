@@ -15,7 +15,7 @@ Invalid Input -  Invalid Request:
 	"category" :  1
 	},
 	{
-	"price" : 10.00,
+	"price" : 10.00
 	}
 ]
 
