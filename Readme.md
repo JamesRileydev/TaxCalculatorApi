@@ -1,7 +1,7 @@
 # TaxCalculator API
 
 The application is written in .NET 5.0 using C# 9 and Visual Studio 2019 Community Edition \
-This application will accept a JSON in an array and return the item totals, sales taxes, and total for the order in JSON format
+This application will accept a JSON array of objects and return the item totals, sales taxes, and total for the order in JSON format
 
 
 ## Installation
@@ -9,7 +9,7 @@ Ensure the .NET 5.0 SDK is installed on your machine \
 Download the repository and open the solution with Visual Studio 2019 \
 Build the solution \
 \
-The repository contains a "Files" directory which contains all of the required sample input request, as well as requests to test validation
+The repository contains a "Files" directory which contains all of the required sample input requests, as well as requests to test validation
 
 
 ## Example Usage
