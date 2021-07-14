@@ -18,9 +18,9 @@ The repository contains a "Files" directory which contains all of the required s
 
 #####  The "category" is an ENUM and the options are as follows:
 Tax Exempt = 1 \
-Tax Exempt Import = 2 \
-Basic Tax = 3 \
-Basic and Import Tax = 4
+Tax Exempt Import = 2  (5%)\
+Basic Tax = 3  (10%)\
+Basic and Import Tax = 4 (5% + 10%)
 
 ---
 
